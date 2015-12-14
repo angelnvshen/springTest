@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="repository.MapperOne">
+
+    <cache/>
+    <!--<select id="getUsers" parameterType="model.User" resultType="model.User">-->
+    <select id="getUsers" parameterType="model.User" resultMap="userResult">
+        select
+          id,
+          name,
+          login_name as loginName,
+          password,
+          salt,
+          email,
+          birth,
+          phone_number as phoneNumber,
+          status,
+          ID_CARD as idCard
+        from t_sys_user
+        where 1=1
+        <if test="loginName != null and loginName != ''">
+            and login_name=#{loginName}
+        </if>
+    </select>
+    
+    <resultMap id="userResult" type="model.User">
+        <association property="idCard" column="idCard" javaType="model.IdCard" select="selectIdCard" />
+        <collection property="cars" column="loginName" ofType="model.Car" select="selectCarsForUser" />
+    </resultMap>
+
+    <select id="selectIdCard" parameterType="string" resultType="model.IdCard">
+        select *From t_idcard where id = #{id}
+    </select>
+
+    <select id="selectCarsForUser" resultMap="resultCars">
+        select * from t_car where owner_id = #{id}
+    </select>
+
+    <resultMap id="resultCars" type="model.Car">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="desc" property="desc" />
+        <result column="owner_id" property="ownerId" />
+    </resultMap>
+
+    <select id="getUsers_2" parameterType="model.User" resultMap="userResult2">
+        select
+        tu.id as id,
+        tu.name as name,
+        tu.login_name as loginName,
+        tu.password as password,
+        tu.salt as salt,
+        tu.email as email,
+        tu.birth as birth,
+        tu.phone_number as phoneNumber,
+        tu.status as status,
+        ti.ID as idCard_id,
+        ti.NUMBER as idCard_NUMBER,
+        ti.DESC as idCard_DESC
+        from t_sys_user tu
+        left join t_idcard ti
+        on tu.ID_CARD = ti.id
+        where 1=1
+        <if test="loginName != null and loginName != ''">
+            and tu.login_name=#{loginName}
+        </if>
+    </select>
+
+    <resultMap id="userResult2" type="model.User" >
+        <id property="id"  column="id"/>
+        <result property="name" column="name"/>
+        <result property="loginName" column="loginName"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="email" column="email"/>
+        <result property="birth" column="birth"/>
+        <result property="phoneNumber" column="phoneNumber"/>
+        <result property="status" column="status"/>
+        <association property="idCard" column="idCard_id" javaType="model.IdCard" resultMap="idCardResult2" />
+    </resultMap>
+    <resultMap id="idCardResult2" type="model.IdCard">
+        <id property="id" column="idCard_id"/>
+        <result property="number" column="idCard_NUMBER"/>
+        <result property="desc" column="idCard_DESC"/>
+    </resultMap>
+
+
+    <select id="selectUsers" resultSets="users,idcards" resultMap="userResult3" statementType="CALLABLE">
+        {call getBlogsAndAuthors(#{loginName,jdbcType=VARCHAR,mode=IN},#{idx,jdbcType=VARCHAR,mode=IN})}
+    </select>
+    <resultMap id="userResult3" type="model.User">
+        <id property="id"  column="id"/>
+        <result property="name" column="name"/>
+        <result property="login_name" column="loginName"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="email" column="email"/>
+        <result property="birth" column="birth"/>
+        <result property="phone_number" column="phoneNumber"/>
+        <result property="status" column="status"/>
+        <association property="idCard" column="ID_CARD" javaType="model.IdCard" resultSet="idcards" foreignColumn="id">
+            <id property="id" column="id"/>
+            <id property="number" column="number"/>
+            <id property="desc" column="desc"/>
+        </association>
+    </resultMap>
+
+    <select id="getUsers_3" parameterType="model.User" resultMap="userResult_3">
+        select
+        tu.id as id,
+        tu.name as name,
+        tu.login_name as loginName,
+        tu.password as password,
+        tu.salt as salt,
+        tu.email as email,
+        tu.birth as birth,
+        tu.phone_number as phoneNumber,
+        tu.status as status,
+        ti.ID as car_id,
+        ti.NAME as car_name,
+        ti.DESC as car_desc,
+        ti.OWNER_ID as car_ownerId
+        from t_sys_user tu
+        left join t_car ti
+        on tu.login_name = ti.OWNER_ID
+        where 1=1
+        <if test="loginName != null and loginName != ''">
+            and tu.login_name=#{loginName}
+        </if>
+    </select>
+    <resultMap id="userResult_3" type="model.User" >
+        <id property="id"  column="id"/>
+        <result property="name" column="name"/>
+        <result property="loginName" column="loginName"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="email" column="email"/>
+        <result property="birth" column="birth"/>
+        <result property="phoneNumber" column="phoneNumber"/>
+        <result property="status" column="status"/>
+        <collection property="cars" ofType="model.Car" >
+            <id property="id" column="car_id" />
+            <result property="name" column="car_name" />
+            <result property="desc" column="car_desc" />
+            <result property="ownerId" column="car_ownerId" />
+        </collection>
+    </resultMap>
+</mapper>

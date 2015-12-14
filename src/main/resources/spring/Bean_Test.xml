@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--<context:annotation-config />-->
+
+    <!--
+        也可以通过申明加载org.springframework.context.annotation.CommonAnnotationBeanPostProcessor
+        类来告诉Spring容器采用的 常用 注解配置的方式
+    -->
+    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
+
+    <bean id="dog" class="spring.model.Dog">
+    </bean>
+    <alias name="dog" alias="dog_same" />
+
+    <bean id="dog_2" class="spring.model.Dog">
+        <constructor-arg type="java.lang.String" value="1"/>
+    </bean>
+
+    <bean id="cat" class="spring.model.Cat" factory-method="getCatInstancc">
+        <constructor-arg name="name" value="tom" />
+        <constructor-arg name="desc" value="funny" />
+    </bean>
+
+    <bean id="car" class="spring.model.Car" init-method="init" destroy-method="destoryed">
+
+    </bean>
+
+    <!-- inherits -->
+    <!--<bean id="inheritedTestParent" class="spring.model.inherit.Parent" abstract="true">-->
+    <bean id="inheritedTestParent" class="spring.model.inherit.Parent" >
+        <property name="name" value="parent" />
+        <property name="age"  value="32" />
+    </bean>
+    <bean id="inheritedTestChild" class="spring.model.inherit.Child" parent="inheritedTestParent">
+        <property name="name" value="child" />
+    </bean>
+    <bean id="inheritedTestChild2" class="spring.model.inherit.Child2" parent="inheritedTestParent">
+        <property name="type" value="222" />
+    </bean>
+
+    <!-- Abstract class instantiate 抽象类一定要加 abstract 属性 且值是true,此时 container 会自动忽略 -->
+    <bean id="abstractparent" class="spring.model.inherit.AbstractParent" abstract="true">
+    </bean>
+
+    <!--  BeanPostProcessor  -->
+    <!--<bean class="spring.model.inherit.InstantiationTracingBeanPostProcessor"/>-->
+
+</beans>
