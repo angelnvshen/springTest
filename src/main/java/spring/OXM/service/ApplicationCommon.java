@@ -2,16 +2,11 @@ package spring.OXM.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.Unmarshaller;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import spring.OXM.model.Settings;
 import spring.OXM.model.SimpleBean;
-import spring.OXM.model.Student;
 
 import javax.annotation.Resource;
 import javax.xml.transform.stream.StreamResult;
@@ -25,17 +20,14 @@ import java.io.IOException;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:spring/Bean_oxm.xml")
-public class Application {
+public class ApplicationCommon {
     private String FILE_NAME = "simpleBean.xml";
 //    private Settings settings = new Settings();
-//    private SimpleBean simpleBean = new SimpleBean();
-    private Student simpleBean = new Student();
+    private SimpleBean simpleBean = new SimpleBean();
 
-//    @Resource(name = "castorMarshaller")
-    @Resource(name = "jaxb2Marshaller")
+    @Resource(name = "castorMarshaller")
     private Marshaller marshaller;
-//    @Resource(name = "castorMarshaller")
-    @Resource(name = "jaxb2Marshaller")
+    @Resource(name = "castorMarshaller")
     private Unmarshaller unmarshaller;
 
     public void setMarshaller(Marshaller marshaller) {
@@ -63,7 +55,7 @@ public class Application {
         FileInputStream is = null;
         try {
             is = new FileInputStream(FILE_NAME);
-            this.simpleBean = (Student) this.unmarshaller.unmarshal(new StreamSource(is));
+            this.simpleBean = (SimpleBean) this.unmarshaller.unmarshal(new StreamSource(is));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -74,13 +66,10 @@ public class Application {
 
     @Test
     public void testMarshaller() throws IOException {
-        /*simpleBean.setAge(35);
+        simpleBean.setAge(35);
         simpleBean.setExecutive(false);
         simpleBean.setJobDescription("Janitor");
-        simpleBean.setName("Mister Jones");*/
-
-        simpleBean.setAge(2);
-        simpleBean.setName("cccc");
+        simpleBean.setName("Mister Jones");
         saveSettings();
         loadingSettings();
     }
